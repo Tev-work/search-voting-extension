@@ -14,7 +14,7 @@ async function run () {
         const url = anchor.href;
         const hostname = (new URL(url)).hostname.replace('www.', '');
 
-        element.classList.add('search-result');
+        element.classList.add('voting-search-result');
 
         const votingContainer = document.createElement('div');
         votingContainer.className = 'voting-container';
@@ -26,8 +26,8 @@ async function run () {
         votingContainer.appendChild(upvoteBtn);
 
         const voteCount = document.createElement('span');
-        voteCount.textContent = 'LD';
-        voteCount.className = 'voting-count';
+        voteCount.appendChild(createSpinner());
+        voteCount.className = 'voting-count vote-loading';
         voteCount.dataset.hostname = hostname;
         votingContainer.appendChild(voteCount);
         voteCountElements.push(voteCount);
@@ -71,5 +71,28 @@ async function run () {
     const votes = await chrome.runtime.sendMessage({ getVotes: true });
     voteCountElements.forEach(element => {
         element.textContent = votes[element.dataset.hostname] ?? 0;
+        element.classList.remove('vote-loading')
     });
 }
+
+function createSpinner() {
+    const spinnerDiv = document.createElement('div');
+    spinnerDiv.className = 'voting-spinner';
+
+    const spinnerSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    spinnerSvg.classList.add('spinner-animation');
+    const spinnerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    spinnerCircle.classList.add('spinner-path');
+
+    spinnerSvg.setAttribute('viewBox', '0 0 50 50');
+    spinnerCircle.setAttribute('cx', '25');
+    spinnerCircle.setAttribute('cy', '25');
+    spinnerCircle.setAttribute('r', '20');
+    spinnerCircle.setAttribute('fill', 'none');
+    spinnerCircle.setAttribute('stroke-width', '5');
+  
+    spinnerSvg.appendChild(spinnerCircle);
+    spinnerDiv.appendChild(spinnerSvg);
+    
+    return spinnerDiv;
+};
