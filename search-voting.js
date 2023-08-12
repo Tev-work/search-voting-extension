@@ -10,7 +10,17 @@ async function run () {
     const voteCountElements = [];
 
     Array.from(searchResults).forEach(element => {
+        // People also ask
+        const hasElementScriptAsFirstChild = element.children[0]?.tagName === 'SCRIPT';
+        if (hasElementScriptAsFirstChild) return;
+
+        // google answer
+        const hasElementBlockAsFirstChild = element.children[0]?.children?.[0]?.tagName === 'BLOCK-COMPONENT';
+        if (hasElementBlockAsFirstChild) return;
+
         const anchor = element.querySelector('a');
+        if (!anchor) return;
+
         const url = anchor.href;
         const hostname = (new URL(url)).hostname.replace('www.', '');
 
